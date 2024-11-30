@@ -101,7 +101,7 @@ DENSITY = 0.3
 
 ![Alt Text](image1.png "SA performance")
 
-## self adaptive solution
+## Adaptive mutation solution
 In this second version of the algorithm, we aim to make the following changes:
 
 1. Optimize the number of iterations: We use a fine-tuned value to avoid wasting execution time on iterations that yield no improvements.
@@ -150,3 +150,53 @@ This improves a lot the execution time for finding the solution without increasi
 
 I show the results obtained by this second version of the code using the same instance problem as before:
 ![Alt Text](image2.png "adaptive parameters performance")
+
+
+## After reviews
+After the reviews received I tried to follow the suggestion of merging the 2 approaches (simulated annealing and adapting mutation solution) with the following code:
+
+```python
+solution= rng.random(NUM_SETS)<1
+history = []
+
+buffer = []
+lunghezza = int(int(DENSITY*100 * np.log(UNIVERSE_SIZE)) / 7)
+solution_fitness = (0, -np.inf) 
+
+step_size = 0.1
+
+for steps in tqdm(range(int(DENSITY*100 * np.log(UNIVERSE_SIZE)))):
+    if steps < int(DENSITY*100 * np.log(UNIVERSE_SIZE)) * 0.2:
+        new_solution = weighted_mutation(solution, strength=step_size * 4) 
+    else:
+        new_solution = weighted_mutation(solution, strength=step_size)
+
+    new_fitness = fitness(new_solution)
+    
+    buffer.append(new_fitness > solution_fitness)
+    
+    # Se trovo una soluzione migliore, aggiorno
+    temperature = 1.0 * (0.01 / 1.0) ** (steps / ITERATIONS)  # Vado a ridurew la temperatura
+    if simulated_annealing_accept(new_fitness, fitness(solution), temperature):
+        solution = new_solution
+        solution_fitness = new_fitness
+
+    history.append(float(solution_fitness[1]))
+
+    if len(buffer) > lunghezza:
+        buffer.pop(0)
+
+    if np.sum(buffer) > 1:
+        step_size = step_size + 0.3*step_size
+    else:
+        step_size = step_size - 0.3*step_size
+
+print("ris finale", fitness(solution)[1])
+plt.plot(range(0, len(history)), history, marker='o')  
+plt.title("Performance over iterations")
+plt.xlabel("Iteration")
+plt.ylabel("Cost")
+plt.show()
+```
+
+It improved a lot the time efficiency of the code by being able to detect a good solution in less time.
