@@ -1,4 +1,4 @@
-# Andrea Mirenda LAB1
+# CI2024_lab1
 
 ## Problem description
 The Set Cover Problem is a classical optimization problem. Given a universe 𝑈 of elements and a collection 𝑆 of subsets of 𝑈 and a cost vector C for each subset, the goal is to find the cheapest list of subsets from 𝑆 whose union covers all elements in the universe 𝑈.
